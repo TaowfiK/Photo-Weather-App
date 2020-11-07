@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Photo Weather</string>
+    <string name="selfie_photo">Selfie Photo</string>
+    <string name="photo_weather">Photo Weather</string>
+    <string name="capture_your_moment">Capture Your Moment</string>
+    <string name="start">Start</string>
 </resources>
