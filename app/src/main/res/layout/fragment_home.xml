@@ -9,16 +9,21 @@
         <variable
             name="hideProgress"
             type="Boolean" />
+        <variable
+            name="listener"
+            type="com.example.photoweather.CameraFragmentListener" />
     </data>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".fragments.HomeFragment">
+
         <ImageView
             android:id="@+id/photo_background"
             android:layout_width="match_parent"
             android:scaleType="fitXY"
             android:layout_height="match_parent" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -132,14 +137,14 @@
                     android:id="@+id/date_Text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{weather.dt}"
+                    android:text="32"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textSize="30sp" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/city_text_view"
@@ -158,11 +163,35 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-        <ProgressBar
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:visibility="@{hideProgress ? View.GONE : View.VISIBLE}" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="@{hideProgress ? View.GONE : View.VISIBLE}"
-            />
+            android:orientation="vertical"
+            android:layout_gravity="center|bottom">
+
+            <Button
+                android:id="@+id/take_a_phote_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="70dp"
+                android:text="@string/take_a_phote"
+                android:onClick="@{() -> listener.takePhotoClicked()}"
+                android:textSize="30sp" />
+        </LinearLayout>
+
 
     </FrameLayout>
 </layout>

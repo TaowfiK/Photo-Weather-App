@@ -36,7 +36,7 @@ public class MainRepository
     public void getCurrentWeather(double latitude, double longitude)
     {
         networkStateLiveData.postValue(NetworkState.LOADING);
-        apiService.getCurrentWeather(latitude, longitude, "1b632eabef34a92fd3fbb4920355d865")
+        apiService.getCurrentWeather(latitude, longitude, "133ddb7ab8008001fa4dbaac4b41b391")
                 .subscribeOn(Schedulers.io())
                 .subscribe(new SingleObserver<CurrentWeatherResponse>()
                 {

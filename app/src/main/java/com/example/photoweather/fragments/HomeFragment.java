@@ -113,8 +113,18 @@ public class HomeFragment extends Fragment {
         setPhotoBackground();
         initLocationService();
         requestPermissions();
+        setViewListeners();
         mViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         networkState();
+    }
+
+    private void setViewListeners(){
+        binding.takeAPhoteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
     private void networkState()
     {
@@ -174,6 +184,7 @@ public class HomeFragment extends Fragment {
                             @Override
                             public void onChanged(CurrentWeatherResponse response)
                             {
+                                Log.d(TAG, "onChanged: response " + response.toString());
                                 binding.setWeather(response);
                             }
                         });
@@ -301,14 +312,14 @@ public class HomeFragment extends Fragment {
                 break;
         }
     }
-//
-//    @Override
-//    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater)
-//    {
-//        super.onCreateOptionsMenu(menu, inflater);
-//        inflater.inflate(R.menu.main_menu, menu);
-//    }
-//
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.bottom_menu, menu);
+    }
+
 //    @Override
 //    public boolean onOptionsItemSelected(@NonNull MenuItem item)
 //    {
