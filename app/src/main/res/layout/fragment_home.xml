@@ -14,6 +14,7 @@
             type="com.example.photoweather.CameraFragmentListener" />
     </data>
     <FrameLayout
+        android:id="@+id/home_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".fragments.HomeFragment">
@@ -188,7 +189,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="70dp"
                 android:text="@string/take_a_phote"
-                android:onClick="@{() -> listener.takePhotoClicked()}"
                 android:textSize="30sp" />
         </LinearLayout>
 
