@@ -45,13 +45,21 @@ public class PrefUtils {
         Log.d(TAG, "getTemperatureInCelsius: " + temperatureInKelvin);
 
         if ( !temperatureInKelvin.equals("null") && !temperatureInKelvin.equals("0.0")) {
+            double temperatureInKelvinDouble;
+            if (temperatureInKelvin.indexOf('℃') != -1){
+                String celsiusSymbol = temperatureInKelvin.substring(temperatureInKelvin.length() - 2);
 
-            String celsiusSymbol = temperatureInKelvin.substring(temperatureInKelvin.length() - 3);
-            temperatureInKelvin = temperatureInKelvin.substring(0, temperatureInKelvin.length() - 3);
-            double temperatureInKelvinDouble = Double.parseDouble(temperatureInKelvin);
+                temperatureInKelvin = temperatureInKelvin.substring(0, temperatureInKelvin.length() - 2);
+                Log.d(TAG, "getTemperatureInCelsius: symbol : " + celsiusSymbol);
+                temperatureInKelvinDouble = Double.parseDouble(temperatureInKelvin);
+                return new DecimalFormat("##.##").format(temperatureInKelvinDouble - 273.15) + celsiusSymbol;
 
-            return new DecimalFormat("##.##").format(temperatureInKelvinDouble - 273.15) + celsiusSymbol;
+            }else{
+                Log.d(TAG, "getTemperatureInCelsius: temprature : " + temperatureInKelvin);
+                temperatureInKelvinDouble = Double.parseDouble(temperatureInKelvin);
 
+                return new DecimalFormat("##.##").format(temperatureInKelvinDouble - 273.15);
+            }
         } else {
             return null;
         }

@@ -1,7 +1,10 @@
 package com.example.photoweather.models.weather;
 
+import android.util.Log;
+
 import com.google.gson.annotations.SerializedName;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class CurrentWeatherResponse {
@@ -100,20 +103,26 @@ public class CurrentWeatherResponse {
         return celsius + " \u2103";
     }
 
+    public String temp(){
+        double temp = calculateCelsius(main.getTemp());
+
+        return new DecimalFormat("##.##").format(temp) + " \u2103";
+    }
+
     public String maxTemp() {
         double maxTemp = calculateCelsius(main.getTempMax());
-
-        return maxTemp + " \u2103";
+        Log.d("Tawfik", "maxTemp: " + maxTemp);
+        return new DecimalFormat("##.##").format(maxTemp)  + " \u2103";
     }
 
     public String minTemp() {
         double minTemp = calculateCelsius(main.getTempMin());
 
-        return minTemp + " \u2103";
+        return new DecimalFormat("##.##").format(minTemp)  + " \u2103";
     }
 
     private double calculateCelsius(double temp) {
-        return (temp - 32) / 1.8;
+        return temp - 273.15;
     }
 
 
