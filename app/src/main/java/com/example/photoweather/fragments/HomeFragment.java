@@ -189,8 +189,12 @@ public class HomeFragment extends Fragment {
             @Override
             public void onLocationResult(LocationResult locationResult)
             {
-                mCurrentLocation = locationResult.getLastLocation();
-                updateUI();
+                Log.d(TAG, "onLocationResult: " + locationResult);
+                if (mCurrentLocation == null){
+                    mCurrentLocation = locationResult.getLastLocation();
+                    updateUI();
+                }
+
                 super.onLocationResult(locationResult);
             }
         };
@@ -221,8 +225,7 @@ public class HomeFragment extends Fragment {
                             {
                                 saveResponseInLocale(response);
                                 takeScreenShotForLayout();
-                                Uri imageContentUri = getImageContentUri(requireActivity());
-                                photo.setPhoto(String.valueOf(imageContentUri));
+
                                 AppExecutors.getInstance().diskIO().execute(new Runnable()
                                 {
                                     @Override
@@ -252,7 +255,6 @@ public class HomeFragment extends Fragment {
                         Log.d(TAG, "onSuccess: Location listener is started");
 
                         mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
-                        updateUI();
                     }
                 }).addOnFailureListener(requireActivity(), new OnFailureListener()
         {
@@ -281,7 +283,6 @@ public class HomeFragment extends Fragment {
                         Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
                 }
 
-                updateUI();
             }
         });
     }
@@ -380,7 +381,15 @@ public class HomeFragment extends Fragment {
                     if (data != null && data.getExtras() != null) {
                         Log.d(TAG, "onActivityResult: data is NOT NULL");
                         Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+                        String s = convertBitmpaToBase64(bitmap);
+                        photo.setPhoto(s);
                         binding.homeLayout.setBackground(new BitmapDrawable(getResources(), bitmap));
+                        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                photoDatabase.photoDao().insert(photo);
+                            }
+                        });
 //                        navigateToMainScreen(bitmap);
 
                     } else {
@@ -524,8 +533,6 @@ public class HomeFragment extends Fragment {
         {
             startLocationListener();
         }
-
-        updateUI();
     }
 
     @Override

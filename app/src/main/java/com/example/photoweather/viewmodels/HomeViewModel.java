@@ -23,6 +23,7 @@ public class HomeViewModel extends ViewModel {
         return repository.getWeatherResponseLiveData();
     }
 
+
     public LiveData<NetworkState> getNetworkState()
     {
         return repository.getNetworkStateLiveData();

@@ -1,6 +1,10 @@
 package com.example.photoweather.adapters;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +36,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
     @Override
     public void onBindViewHolder(@NonNull PhotoHolder holder, int position) {
         Photo currentPhotoItem = allPhotos.get(position);
-        holder.photoImageView.setImageDrawable(new BitmapDrawable(PrefUtils.StringToBitMap(currentPhotoItem.getPhoto())));
+        holder.photoImageView.setImageDrawable(new BitmapDrawable(convertBase64ToBitmap(currentPhotoItem.getPhoto())));
         holder.photoDateTextView.setText(currentPhotoItem.getDate());
         holder.photoTimeTextView.setText(currentPhotoItem.getTime());
     }
@@ -59,5 +63,15 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
             photoDateTextView = itemView.findViewById(R.id.photo_date_text_view);
             photoTimeTextView = itemView.findViewById(R.id.photo_time_text_view);
         }
+    }
+    private Bitmap convertBase64ToBitmap(String encryptedImage)
+    {
+        Log.d("Tawfik", "convertBase64ToBitmap: " + encryptedImage);
+        byte[] decodedBytes = Base64.decode(
+                encryptedImage.substring(encryptedImage.indexOf(",")  + 1),
+                Base64.DEFAULT
+        );
+
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
 }

@@ -16,16 +16,21 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.room.Database;
 
 import com.example.photoweather.adapters.PhotoAdapter;
 import com.example.photoweather.databinding.FragmentHistoryListBinding;
+import com.example.photoweather.db.PhotoDatabase;
 import com.example.photoweather.models.Photo;
+import com.example.photoweather.viewmodels.HomeViewModel;
 
 import java.util.List;
 
 public class HistoryFragment extends Fragment {
 
     private FragmentHistoryListBinding binding;
+    private PhotoDatabase photoDatabase;
+    private Photo photo;
 
 
     @Override
@@ -52,7 +57,17 @@ public class HistoryFragment extends Fragment {
         binding.photoList.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
-
+        PhotoAdapter photoAdapter = new PhotoAdapter();
+        PhotoDatabase photoDatabase = PhotoDatabase.getInstance(requireContext());
+        Log.d("Tawfik", "onViewCreated: history ");
+        photoDatabase.photoDao().getAllphotos().observe(getViewLifecycleOwner(), new Observer<List<Photo>>() {
+            @Override
+            public void onChanged(List<Photo> photos) {
+                Log.d("Tawfik", "onChanged: " + photos.get(0).getPhoto());
+                photoAdapter.setPhotos(photos);
+                binding.photoList.setAdapter(photoAdapter);
+            }
+        });
 
 
     }
