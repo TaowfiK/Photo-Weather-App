@@ -8,4 +8,6 @@
     <string name="share">share</string>
     <string name="green_up_arrow">Green Up Arrow</string>
     <string name="red_down_arrow">Red Down Arrow</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -79,7 +79,6 @@ public class HomeFragment extends Fragment {
 
     private HomeViewModel mViewModel;
     private FragmentHomeBinding binding;
-    private Photo currentPhoto;
     private PhotoDatabase photoDatabase;
     private Photo photo;
 
@@ -174,6 +173,7 @@ public class HomeFragment extends Fragment {
                 } else
                 {
                     binding.setHideProgress(true);
+                    binding.takeAPhoteButton.setEnabled(true);
                 }
             }
         });
@@ -226,15 +226,15 @@ public class HomeFragment extends Fragment {
                                 saveResponseInLocale(response);
                                 takeScreenShotForLayout();
 
-                                AppExecutors.getInstance().diskIO().execute(new Runnable()
-                                {
-                                    @Override
-                                    public void run()
-                                    {
-                                        photoDatabase.photoDao().insert(photo);
-                                        Log.d(TAG, "run: success");
-                                    }
-                                });
+//                                AppExecutors.getInstance().diskIO().execute(new Runnable()
+//                                {
+//                                    @Override
+//                                    public void run()
+//                                    {
+//                                        photoDatabase.photoDao().insert(photo);
+//                                        Log.d(TAG, "run: success");
+//                                    }
+//                                });
 
                             }
                         });
@@ -381,15 +381,16 @@ public class HomeFragment extends Fragment {
                     if (data != null && data.getExtras() != null) {
                         Log.d(TAG, "onActivityResult: data is NOT NULL");
                         Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-                        String s = convertBitmpaToBase64(bitmap);
-                        photo.setPhoto(s);
                         binding.homeLayout.setBackground(new BitmapDrawable(getResources(), bitmap));
+                        String s = convertBitmpaToBase64(takeScreenShotForLayout());
+                        photo.setPhoto(s);
                         AppExecutors.getInstance().diskIO().execute(new Runnable() {
                             @Override
                             public void run() {
                                 photoDatabase.photoDao().insert(photo);
                             }
                         });
+                        binding.shareButton.setEnabled(true);
 //                        navigateToMainScreen(bitmap);
 
                     } else {

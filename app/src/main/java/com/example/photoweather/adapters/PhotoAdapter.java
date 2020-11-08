@@ -25,6 +25,11 @@ import java.util.List;
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder> {
 
     private List<Photo> allPhotos = new ArrayList<>();
+    private onPhotoClickListener onPhotoClickListener;
+
+    public void setOnPhotoClickListener(PhotoAdapter.onPhotoClickListener onPhotoClickListener) {
+        this.onPhotoClickListener = onPhotoClickListener;
+    }
 
     @NonNull
     @Override
@@ -39,6 +44,13 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
         holder.photoImageView.setImageDrawable(new BitmapDrawable(convertBase64ToBitmap(currentPhotoItem.getPhoto())));
         holder.photoDateTextView.setText(currentPhotoItem.getDate());
         holder.photoTimeTextView.setText(currentPhotoItem.getTime());
+
+       holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onPhotoClickListener.onPhotoClickListener(convertBase64ToBitmap(currentPhotoItem.getPhoto()));
+            }
+        });
     }
 
     @Override
@@ -62,6 +74,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
             photoImageView = itemView.findViewById(R.id.photo_image_viw);
             photoDateTextView = itemView.findViewById(R.id.photo_date_text_view);
             photoTimeTextView = itemView.findViewById(R.id.photo_time_text_view);
+
+
         }
     }
     private Bitmap convertBase64ToBitmap(String encryptedImage)
@@ -74,4 +88,9 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
 
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
+
+    public interface onPhotoClickListener{
+        void onPhotoClickListener(Bitmap encryptedImage);
+    }
+
 }

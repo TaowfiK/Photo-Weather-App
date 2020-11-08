@@ -172,6 +172,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="70dp"
                 android:text="@string/take_a_phote"
+                android:enabled="false"
                 android:textSize="30sp" />
             <Button
                 android:id="@+id/share_button"
@@ -180,6 +181,7 @@
                 android:layout_below="@id/take_a_phote_button"
                 android:layout_marginBottom="70dp"
                 android:text="@string/share"
+                android:enabled="false"
                 android:layout_centerInParent="true"
                 android:textSize="30sp" />
 
