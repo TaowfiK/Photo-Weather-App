@@ -23,10 +23,15 @@
     </data>
 
     <FrameLayout
-        android:id="@+id/home_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".fragments.HomeFragment">
+
+        <FrameLayout
+            android:id="@+id/home_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
 
         <ImageView
             android:id="@+id/photo_background"
@@ -153,6 +158,8 @@
                 android:visibility="@{hideProgress ? View.GONE : View.VISIBLE}" />
         </LinearLayout>
 
+        </FrameLayout>
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -177,7 +184,6 @@
                 android:textSize="30sp" />
 
         </RelativeLayout>
-
 
     </FrameLayout>
 </layout>
