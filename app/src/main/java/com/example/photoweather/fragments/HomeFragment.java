@@ -34,10 +34,13 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.photoweather.databinding.FragmentHomeBinding;
+import com.example.photoweather.models.Photo;
 import com.example.photoweather.models.weather.CurrentWeatherResponse;
 import com.example.photoweather.networking.NetworkState;
+import com.example.photoweather.utils.PrefUtils;
 import com.example.photoweather.viewmodels.HomeViewModel;
 import com.example.photoweather.R;
+import com.example.photoweather.viewmodels.PhotoViewModel;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -73,7 +76,9 @@ public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";
 
     private HomeViewModel mViewModel;
+    private PhotoViewModel photoViewModel;
     private FragmentHomeBinding binding;
+    private Photo currentPhoto;
 
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
 
@@ -125,6 +130,7 @@ public class HomeFragment extends Fragment {
         requestPermissions();
         setViewListeners();
         mViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        photoViewModel = new ViewModelProvider(this).get(PhotoViewModel.class);
         networkState();
     }
 
@@ -212,6 +218,9 @@ public class HomeFragment extends Fragment {
                             public void onChanged(CurrentWeatherResponse response)
                             {
                                 Log.d(TAG, "onChanged: response " + response.toString());
+                                currentPhoto = new Photo();
+                                currentPhoto.setDate(PrefUtils.getDate(response.getDt()));
+                                currentPhoto.setTime(PrefUtils.getTime(response.getDt()));
                                 binding.setWeather(response);
                             }
                         });
@@ -316,7 +325,9 @@ public class HomeFragment extends Fragment {
         if (getArguments() != null)
         {
             Bitmap bitmap = getArguments().getParcelable("bitmap");
+            currentPhoto.setPhoto(PrefUtils.BitMapToString(bitmap));
             binding.photoBackground.setImageBitmap(bitmap);
+            photoViewModel.insert(currentPhoto);
         }
 
     }
