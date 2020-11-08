@@ -1,8 +1,6 @@
 package com.example.photoweather.fragments;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,26 +9,24 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.room.Database;
 
+import com.example.photoweather.R;
 import com.example.photoweather.adapters.PhotoAdapter;
 import com.example.photoweather.databinding.FragmentHistoryListBinding;
 import com.example.photoweather.db.PhotoDatabase;
 import com.example.photoweather.models.Photo;
-import com.example.photoweather.viewmodels.HomeViewModel;
 
 import java.util.List;
 
 public class HistoryFragment extends Fragment {
 
     private FragmentHistoryListBinding binding;
-    private PhotoDatabase photoDatabase;
-    private Photo photo;
+    private NavController navController;
 
 
     @Override
@@ -55,7 +51,7 @@ public class HistoryFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         binding.photoList.setLayoutManager(new LinearLayoutManager(getContext()));
-
+        navController = Navigation.findNavController(requireActivity(), R.id.fragment);
 
         PhotoAdapter photoAdapter = new PhotoAdapter();
         PhotoDatabase photoDatabase = PhotoDatabase.getInstance(requireContext());
@@ -69,60 +65,18 @@ public class HistoryFragment extends Fragment {
             }
         });
 
+        photoAdapter.setOnPhotoClickListener(new PhotoAdapter.onPhotoClickListener() {
+            @Override
+            public void onPhotoClickListener(Bitmap bitmap) {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("bitmap", bitmap);
+                PhotoFragment photoFragment = new PhotoFragment();
+                photoFragment.setArguments(bundle);
+                navController.navigate(R.id.photoFragment, bundle);
+            }
+        });
+
 
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == 1 && resultCode == RESULT_OK) {
-//            imageFragmentContainer.setVisibility(View.VISIBLE);
-//            bitmaps = new ArrayList<>();
-//            imageSources = new ArrayList<>();
-//            ClipData clipData = data.getClipData();
-//            //clip data will be null if user select one item from gallery
-//
-//            if (clipData != null) {
-//                for (int i = 0; i < clipData.getItemCount(); i++) {
-//                    Uri imageUri = clipData.getItemAt(i).getUri();
-//                    try {
-//                        InputStream is = getContentResolver().openInputStream(imageUri);
-//                        Bitmap bitmap = BitmapFactory.decodeStream(is);
-//                        bitmaps.add(bitmap);
-//                        String imageSource = ImageBitmapString.BitMapToString(bitmap);
-//                        imageSources.add(imageSource);
-//                    } catch (FileNotFoundException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                }
-//            } else {
-//                Uri imageUri = data.getData();
-//                try {
-//                    InputStream is = getContentResolver().openInputStream(imageUri);
-//                    Bitmap bitmap = BitmapFactory.decodeStream(is);
-//                    bitmaps.add(bitmap);
-//                    String imageSource = ImageBitmapString.BitMapToString(bitmap);
-//                    imageSources.add(imageSource);
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//    }
-//
-
-    private void loadImagesFromGallery() {
-
-        if (ActivityCompat.checkSelfPermission(getContext(),
-                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    100);
-            return;
-        }
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        intent.setType("image/*");
-        startActivityForResult(intent, 1);
-    }
 }

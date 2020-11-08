@@ -14,13 +14,12 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.photoweather.databinding.ActivitySplashScreenBinding;
+import com.example.photoweather.databinding.FragmentHistoryListBinding;
+
 public class InitialActivity extends AppCompatActivity {
 
-    // Views
-    private ImageView splashScreenImageView;
-    private TextView photoWeatherTextView;
-    private TextView vibeTextView;
-    private Button startButton;
+    private ActivitySplashScreenBinding binding;
 
     //animation
     Animation topAnim, bottomAnim, vibeFadeInAnim, buttonFadeInAnim;
@@ -44,36 +43,30 @@ public class InitialActivity extends AppCompatActivity {
         vibeFadeInAnim.setDuration(4000);
         buttonFadeInAnim.setDuration(1000);
 
+        //binding
+        binding.splashImageView.setAnimation(topAnim);
+        binding.photoWeatherTextView.setAnimation(bottomAnim);
+        binding.vibeTextView.setAnimation(vibeFadeInAnim);
+        binding.startButton.setAnimation(buttonFadeInAnim);
 
-        //views
-        splashScreenImageView = findViewById(R.id.splash_image_view);
-        photoWeatherTextView = findViewById(R.id.photo_weather_text_view);
-        vibeTextView = findViewById(R.id.vibe_text_view);
-        startButton = findViewById(R.id.startButton);
+        setCounterForStartButton();
 
-        photoWeatherTextView.setAnimation(topAnim);
-        splashScreenImageView.setAnimation(bottomAnim);
-        vibeTextView.setAnimation(vibeFadeInAnim);
-        startButton.setAnimation(buttonFadeInAnim);
+        binding.startButton.setOnClickListener(v -> {
+            Intent myIntent = new Intent(InitialActivity.this, MainActivity.class);
+            InitialActivity.this.startActivity(myIntent);
+        });
+    }
 
-        new CountDownTimer(3000, 1000) {
+    private void setCounterForStartButton() {
+        new CountDownTimer(2500, 1000) {
 
             public void onTick(long millisUntilFinished) {
             }
 
             public void onFinish() {
-                startButton.setVisibility(View.VISIBLE);
+                binding.startButton.setVisibility(View.VISIBLE);
             }
 
         }.start();
-
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent myIntent = new Intent(InitialActivity.this, MainActivity.class);
-                myIntent.putExtra("key", "200"); //Optional parameters
-                InitialActivity.this.startActivity(myIntent);
-            }
-        });
     }
 }
