@@ -32,8 +32,4 @@ public class NetworkState
         return state;
     }
 
-    public String getMessage()
-    {
-        return message;
-    }
 }

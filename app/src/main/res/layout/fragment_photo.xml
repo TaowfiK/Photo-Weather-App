@@ -2,7 +2,6 @@
 <layout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,15 +16,11 @@
             android:layout_margin="8dp"
             android:src="@drawable/ic_arrow_back" />
 
-        <!-- TODO: Update blank fragment layout -->
         <ImageView
             android:id="@+id/selected_photo_image_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/taking_selfie"
-            android:text="@string/hello_blank_fragment" />
-
-
+            android:src="@drawable/taking_selfie" />
 
     </LinearLayout>
 

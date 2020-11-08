@@ -33,7 +33,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.photoweather.AppExecutors;
+import com.example.photoweather.utils.AppExecutors;
 import com.example.photoweather.databinding.FragmentHomeBinding;
 import com.example.photoweather.db.PhotoDatabase;
 import com.example.photoweather.models.Photo;
@@ -93,7 +93,6 @@ public class HomeFragment extends Fragment {
     private static final int RC_CAMERA_PERMISSION = 200;
 
 
-
     private FusedLocationProviderClient mFusedLocationClient;
     private SettingsClient mSettingsClient;
     private LocationRequest mLocationRequest;
@@ -108,26 +107,23 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         photoDatabase = PhotoDatabase.getInstance(requireContext());
-        photo= new Photo();
+        photo = new Photo();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
-    {
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
-    {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setPhotoBackground();
         initLocationService();
@@ -137,16 +133,14 @@ public class HomeFragment extends Fragment {
         networkState();
     }
 
-    private void setViewListeners(){
+    private void setViewListeners() {
         binding.takeAPhoteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-                {
+                if (checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "onClick: take photo need permission");
                     requestPermissions(new String[]{Manifest.permission.CAMERA}, RC_CAMERA_PERMISSION);
-                } else
-                {
+                } else {
                     Log.d(TAG, "onClick: take photo should open camera");
                     openCamera();
                 }
@@ -155,23 +149,18 @@ public class HomeFragment extends Fragment {
         binding.shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                shareBitmap(requireActivity(),  takeScreenShotForLayout());
+                shareBitmap(requireActivity(), takeScreenShotForLayout());
             }
         });
     }
 
-    private void networkState()
-    {
-        mViewModel.getNetworkState().observe(getViewLifecycleOwner(), new Observer<NetworkState>()
-        {
+    private void networkState() {
+        mViewModel.getNetworkState().observe(getViewLifecycleOwner(), new Observer<NetworkState>() {
             @Override
-            public void onChanged(NetworkState networkState)
-            {
-                if (networkState.getState() == NetworkState.State.LOADING)
-                {
+            public void onChanged(NetworkState networkState) {
+                if (networkState.getState() == NetworkState.State.LOADING) {
                     binding.setHideProgress(false);
-                } else
-                {
+                } else {
                     binding.setHideProgress(true);
                     binding.takeAPhoteButton.setEnabled(true);
                 }
@@ -179,18 +168,15 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void initLocationService()
-    {
+    private void initLocationService() {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         mSettingsClient = LocationServices.getSettingsClient(requireActivity());
 
-        mLocationCallback = new LocationCallback()
-        {
+        mLocationCallback = new LocationCallback() {
             @Override
-            public void onLocationResult(LocationResult locationResult)
-            {
+            public void onLocationResult(LocationResult locationResult) {
                 Log.d(TAG, "onLocationResult: " + locationResult);
-                if (mCurrentLocation == null){
+                if (mCurrentLocation == null) {
                     mCurrentLocation = locationResult.getLastLocation();
                     updateUI();
                 }
@@ -211,31 +197,15 @@ public class HomeFragment extends Fragment {
         mLocationSettingsRequest = builder.build();
     }
 
-    private void updateUI()
-    {
-        if (mCurrentLocation != null)
-        {
-            if (mCurrentLocation.getLatitude() != 0 && mCurrentLocation.getLongitude() != 0)
-            {
+    private void updateUI() {
+        if (mCurrentLocation != null) {
+            if (mCurrentLocation.getLatitude() != 0 && mCurrentLocation.getLongitude() != 0) {
                 mViewModel.getCurrentWeather(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())
-                        .observe(getViewLifecycleOwner(), new Observer<CurrentWeatherResponse>()
-                        {
+                        .observe(getViewLifecycleOwner(), new Observer<CurrentWeatherResponse>() {
                             @Override
-                            public void onChanged(CurrentWeatherResponse response)
-                            {
+                            public void onChanged(CurrentWeatherResponse response) {
                                 saveResponseInLocale(response);
                                 takeScreenShotForLayout();
-
-//                                AppExecutors.getInstance().diskIO().execute(new Runnable()
-//                                {
-//                                    @Override
-//                                    public void run()
-//                                    {
-//                                        photoDatabase.photoDao().insert(photo);
-//                                        Log.d(TAG, "run: success");
-//                                    }
-//                                });
-
                             }
                         });
             }
@@ -243,36 +213,28 @@ public class HomeFragment extends Fragment {
 
     }
 
-    private void startLocationListener()
-    {
+    private void startLocationListener() {
         mSettingsClient.checkLocationSettings(mLocationSettingsRequest)
-                .addOnSuccessListener(requireActivity(), new OnSuccessListener<LocationSettingsResponse>()
-                {
+                .addOnSuccessListener(requireActivity(), new OnSuccessListener<LocationSettingsResponse>() {
                     @SuppressLint("MissingPermission")
                     @Override
-                    public void onSuccess(LocationSettingsResponse locationSettingsResponse)
-                    {
+                    public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
                         Log.d(TAG, "onSuccess: Location listener is started");
 
                         mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
                     }
-                }).addOnFailureListener(requireActivity(), new OnFailureListener()
-        {
+                }).addOnFailureListener(requireActivity(), new OnFailureListener() {
             @Override
-            public void onFailure(@NonNull Exception e)
-            {
+            public void onFailure(@NonNull Exception e) {
                 int statusCode = ((ApiException) e).getStatusCode();
-                switch (statusCode)
-                {
+                switch (statusCode) {
                     case LocationSettingsStatusCodes
                             .RESOLUTION_REQUIRED:
                         Log.d(TAG, "onFailure: Location settings are not satisfied. Attempting to upgrade location settings ");
-                        try
-                        {
+                        try {
                             ResolvableApiException rae = (ResolvableApiException) e;
                             rae.startResolutionForResult(requireActivity(), REQUEST_CHECK_SETTINGS);
-                        } catch (IntentSender.SendIntentException sendIntentException)
-                        {
+                        } catch (IntentSender.SendIntentException sendIntentException) {
                             sendIntentException.printStackTrace();
                         }
 
@@ -287,38 +249,31 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    public void requestPermissions()
-    {
+    public void requestPermissions() {
         Dexter.withActivity(requireActivity())
                 .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                .withListener(new PermissionListener()
-                {
+                .withListener(new PermissionListener() {
                     @Override
-                    public void onPermissionGranted(PermissionGrantedResponse response)
-                    {
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
                         mRequestingLocationUpdates = true;
                         startLocationListener();
                     }
 
                     @Override
-                    public void onPermissionDenied(PermissionDeniedResponse response)
-                    {
-                        if (response.isPermanentlyDenied())
-                        {
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+                        if (response.isPermanentlyDenied()) {
                             openSettings();
                         }
                     }
 
                     @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token)
-                    {
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
                         token.continuePermissionRequest();
                     }
                 }).check();
     }
 
-    private void openSettings()
-    {
+    private void openSettings() {
         Intent intent = new Intent();
         intent.setAction(
                 Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -330,10 +285,8 @@ public class HomeFragment extends Fragment {
     }
 
 
-    private void setPhotoBackground()
-    {
-        if (getArguments() != null)
-        {
+    private void setPhotoBackground() {
+        if (getArguments() != null) {
             Bitmap bitmap = getArguments().getParcelable("bitmap");
             binding.photoBackground.setImageBitmap(bitmap);
             String base64 = convertBitmpaToBase64(bitmap);
@@ -343,17 +296,13 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == RC_CAMERA_PERMISSION)
-        {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            {
+        if (requestCode == RC_CAMERA_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(requireContext(), "camera permission granted", Toast.LENGTH_LONG).show();
                 openCamera();
-            } else
-            {
+            } else {
                 Toast.makeText(requireContext(), "camera permission denied", Toast.LENGTH_LONG).show();
 
             }
@@ -361,8 +310,7 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
-    {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_CHECK_SETTINGS:
@@ -391,7 +339,6 @@ public class HomeFragment extends Fragment {
                             }
                         });
                         binding.shareButton.setEnabled(true);
-//                        navigateToMainScreen(bitmap);
 
                     } else {
                         Log.d(TAG, "onActivityResult: data is NULL");
@@ -404,82 +351,46 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater)
-    {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.bottom_menu, menu);
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(@NonNull MenuItem item)
-//    {
-//        if (item.getItemId() == R.id.share)
-//        {
-//            shareBitmap(requireActivity(), takeScreenShotForLayout());
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
-
-    private void shareBitmap(Activity requireActivity, Bitmap bitmap)
-    {
+    private void shareBitmap(Activity requireActivity, Bitmap bitmap) {
         createDirectoryAndSaveImage(requireActivity, bitmap);
         getImageUriAndShare(requireActivity);
 
     }
-//
-//    private void navigateToMainScreen(Bitmap bitmap)
-//    {
-//        Bundle bundle = new Bundle();
-//        bundle.putParcelable("bitmap", bitmap);
-//        Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-//                .navigate(R.id.action_cameraFragment_to_mainFragment, bundle);
-//    }
 
-    private void getImageUriAndShare(Activity requireActivity)
-    {
-        try
-        {
+    private void getImageUriAndShare(Activity requireActivity) {
+        try {
 
             Uri contentUri = getImageContentUri(requireActivity);
 
-            if (contentUri != null)
-            {
+            if (contentUri != null) {
                 shareImage(contentUri, requireActivity);
 
             }
-        } catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    private String convertBitmpaToBase64(Bitmap bitmap)
-    {
+    private String convertBitmpaToBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream .toByteArray();
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
 
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
-    private Bitmap convertBase64ToBitmap(String encryptedImage)
-    {
-        byte[] decodedBytes = Base64.decode(
-                encryptedImage.substring(encryptedImage.indexOf(",")  + 1),
-                Base64.DEFAULT
-        );
-
-        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-    }
-
-    private void saveResponseInLocale(CurrentWeatherResponse response)
-    {
+    private void saveResponseInLocale(CurrentWeatherResponse response) {
         photo.setDate(PrefUtils.getDate(response.getDt()));
+        photo.setTime(PrefUtils.getTime(response.getDt()));
         binding.setWeather(response);
     }
 
-    private void shareImage(Uri contentUri, Activity requireActivity)
-    {
+    private void shareImage(Uri contentUri, Activity requireActivity) {
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -488,38 +399,31 @@ public class HomeFragment extends Fragment {
         startActivity(Intent.createChooser(shareIntent, "Share with..."));
     }
 
-    private Uri getImageContentUri(Activity requireActivity)
-    {
+    private Uri getImageContentUri(Activity requireActivity) {
         File imagePath = new File(requireActivity.getCacheDir(), "images");
         File newFile = new File(imagePath, "image.png");
         return FileProvider.getUriForFile(requireContext(), "com.example.photoweather.provider", newFile);
     }
 
-    private void createDirectoryAndSaveImage(Activity requireActivity, Bitmap bitmap)
-    {
-        try
-        {
+    private void createDirectoryAndSaveImage(Activity requireActivity, Bitmap bitmap) {
+        try {
             File cachePath = new File(requireActivity.getCacheDir(), "images");
             cachePath.mkdirs(); // don't forget to make the directory
             FileOutputStream stream = new FileOutputStream(cachePath + "/image.png"); // overwrites this image every time
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             stream.close();
 
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private Bitmap takeScreenShotForLayout()
-    {
-        try
-        {
+    private Bitmap takeScreenShotForLayout() {
+        try {
             View rootView = getActivity().getWindow().getDecorView().findViewById(R.id.home_layout);
             rootView.setDrawingCacheEnabled(true);
             return rootView.getDrawingCache();
-        } catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -527,48 +431,40 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
-        if (mRequestingLocationUpdates && checkPermissions())
-        {
+        if (mRequestingLocationUpdates && checkPermissions()) {
             startLocationListener();
         }
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
-        if (mRequestingLocationUpdates)
-        {
+        if (mRequestingLocationUpdates) {
             // pausing location updates
             stopLocationUpdates();
         }
     }
 
-    private boolean checkPermissions()
-    {
+    private boolean checkPermissions() {
         int permissionState = ActivityCompat.checkSelfPermission(requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION);
         return permissionState == PackageManager.PERMISSION_GRANTED;
     }
 
-    public void stopLocationUpdates()
-    {
+    public void stopLocationUpdates() {
         mFusedLocationClient
                 .removeLocationUpdates(mLocationCallback)
-                .addOnCompleteListener(requireActivity(), new OnCompleteListener<Void>()
-                {
+                .addOnCompleteListener(requireActivity(), new OnCompleteListener<Void>() {
                     @Override
-                    public void onComplete(@NonNull Task<Void> task)
-                    {
+                    public void onComplete(@NonNull Task<Void> task) {
                         Toast.makeText(requireContext(), "Location updates stopped!", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
-    private void openCamera()
-    {
+
+    private void openCamera() {
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cameraIntent, RC_CAMERA_REQUEST);
     }

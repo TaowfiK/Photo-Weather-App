@@ -8,7 +8,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient
 {
-    private static final String TAG = "RetrofitClient";
 
     private static Retrofit retrofit = null;
 

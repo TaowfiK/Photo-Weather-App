@@ -11,27 +11,23 @@ public class HomeViewModel extends ViewModel {
 
     private MainRepository repository;
 
-    public HomeViewModel()
-    {
+    public HomeViewModel() {
         repository = new MainRepository();
     }
 
-    public LiveData<CurrentWeatherResponse> getCurrentWeather(double latitude, double longitude)
-    {
+    public LiveData<CurrentWeatherResponse> getCurrentWeather(double latitude, double longitude) {
         repository.getCurrentWeather(latitude, longitude);
 
         return repository.getWeatherResponseLiveData();
     }
 
 
-    public LiveData<NetworkState> getNetworkState()
-    {
+    public LiveData<NetworkState> getNetworkState() {
         return repository.getNetworkStateLiveData();
     }
 
     @Override
-    protected void onCleared()
-    {
+    protected void onCleared() {
         super.onCleared();
         repository.getDisposable().dispose();
     }

@@ -111,7 +111,6 @@ public class CurrentWeatherResponse {
 
     public String maxTemp() {
         double maxTemp = calculateCelsius(main.getTempMax());
-        Log.d("Tawfik", "maxTemp: " + maxTemp);
         return new DecimalFormat("##.##").format(maxTemp)  + " \u2103";
     }
 

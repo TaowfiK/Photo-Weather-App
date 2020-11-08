@@ -30,24 +30,20 @@ public class HistoryFragment extends Fragment {
 
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
-    {
-        // Inflate the layout for this fragment
+                             Bundle savedInstanceState) {
         binding = FragmentHistoryListBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
-    {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         binding.photoList.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -55,11 +51,9 @@ public class HistoryFragment extends Fragment {
 
         PhotoAdapter photoAdapter = new PhotoAdapter();
         PhotoDatabase photoDatabase = PhotoDatabase.getInstance(requireContext());
-        Log.d("Tawfik", "onViewCreated: history ");
         photoDatabase.photoDao().getAllphotos().observe(getViewLifecycleOwner(), new Observer<List<Photo>>() {
             @Override
             public void onChanged(List<Photo> photos) {
-                Log.d("Tawfik", "onChanged: " + photos.get(0).getPhoto());
                 photoAdapter.setPhotos(photos);
                 binding.photoList.setAdapter(photoAdapter);
             }

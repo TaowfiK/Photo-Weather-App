@@ -16,8 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.photoweather.R;
 import com.example.photoweather.models.Photo;
-import com.example.photoweather.utils.ImageBitmapString;
-import com.example.photoweather.utils.PrefUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +43,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
         holder.photoDateTextView.setText(currentPhotoItem.getDate());
         holder.photoTimeTextView.setText(currentPhotoItem.getTime());
 
-       holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onPhotoClickListener.onPhotoClickListener(convertBase64ToBitmap(currentPhotoItem.getPhoto()));
@@ -58,12 +56,12 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
         return allPhotos.size();
     }
 
-    public void setPhotos(List<Photo> photos){
+    public void setPhotos(List<Photo> photos) {
         this.allPhotos = photos;
         notifyDataSetChanged();
     }
 
-    class PhotoHolder extends RecyclerView.ViewHolder{
+    class PhotoHolder extends RecyclerView.ViewHolder {
 
         private ImageView photoImageView;
         private TextView photoDateTextView;
@@ -78,18 +76,17 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
 
         }
     }
-    private Bitmap convertBase64ToBitmap(String encryptedImage)
-    {
-        Log.d("Tawfik", "convertBase64ToBitmap: " + encryptedImage);
+
+    private Bitmap convertBase64ToBitmap(String encryptedImage) {
         byte[] decodedBytes = Base64.decode(
-                encryptedImage.substring(encryptedImage.indexOf(",")  + 1),
+                encryptedImage.substring(encryptedImage.indexOf(",") + 1),
                 Base64.DEFAULT
         );
 
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
 
-    public interface onPhotoClickListener{
+    public interface onPhotoClickListener {
         void onPhotoClickListener(Bitmap encryptedImage);
     }
 

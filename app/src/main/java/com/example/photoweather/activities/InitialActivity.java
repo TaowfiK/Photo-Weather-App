@@ -1,4 +1,4 @@
-package com.example.photoweather;
+package com.example.photoweather.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,7 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.photoweather.databinding.FragmentHistoryListBinding;
+import com.example.photoweather.R;
 
 public class InitialActivity extends AppCompatActivity {
 
@@ -69,7 +69,7 @@ public class InitialActivity extends AppCompatActivity {
         });
     }
 
-    private void setCounterForStartButton(){
+    private void setCounterForStartButton() {
         new CountDownTimer(2500, 1000) {
 
             public void onTick(long millisUntilFinished) {
