@@ -2,18 +2,6 @@ package com.example.photoweather.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
-
-import androidx.room.TypeConverter;
-
-import java.io.ByteArrayOutputStream;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 public class PrefUtils {
 
@@ -63,23 +51,39 @@ public class PrefUtils {
         return getSharedPreferences(context).getString("API_KEY", null);
     }
 
-    public static String getDate(int fullDate) {
-        Timestamp timestamp = new Timestamp(fullDate * 1000);
-        Date date = new Date(timestamp.getTime());
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-        return dateFormatter.format(date);
+    public static String getDate(int dateInMilliSeconds){
+        long validDateInMilliSeconds = (long) dateInMilliSeconds * 1000;
+        if (validDateInMilliSeconds != 0) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMMM yyyy");
+            String dateString = simpleDateFormat.format(validDateInMilliSeconds);
+            return dateString;
+        }else {
+            return null;
+        }
     }
 
-    public static String getTime(int fullDate) {
+    @SuppressLint("DefaultLocale")
+    public static String getTemperatureInCelsius(String temperatureInKelvin){
+        Log.d(TAG, "getTemperatureInCelsius: " + temperatureInKelvin);
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        if ( !temperatureInKelvin.equals("null") && !temperatureInKelvin.equals("0.0")) {
+            double temperatureInKelvinDouble;
+            if (temperatureInKelvin.indexOf('℃') != -1){
+                String celsiusSymbol = temperatureInKelvin.substring(temperatureInKelvin.length() - 2);
 
-        Timestamp timestamp = new Timestamp(fullDate * 1000);
-        Date date = new Date(timestamp.getTime());
-        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                temperatureInKelvin = temperatureInKelvin.substring(0, temperatureInKelvin.length() - 2);
+                Log.d(TAG, "getTemperatureInCelsius: symbol : " + celsiusSymbol);
+                temperatureInKelvinDouble = Double.parseDouble(temperatureInKelvin);
+                return new DecimalFormat("##.##").format(temperatureInKelvinDouble - 273.15) + celsiusSymbol;
 
-        return timeFormatter.format(date);
+            }else{
+                Log.d(TAG, "getTemperatureInCelsius: temprature : " + temperatureInKelvin);
+                temperatureInKelvinDouble = Double.parseDouble(temperatureInKelvin);
+
+                return new DecimalFormat("##.##").format(temperatureInKelvinDouble - 273.15);
+            }
+        } else {
+            return null;
+        }
     }
-
-
 }

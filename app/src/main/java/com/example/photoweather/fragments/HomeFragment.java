@@ -156,8 +156,6 @@ public class HomeFragment extends Fragment {
         binding.shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                binding.takeAPhoteButton.setVisibility(View.GONE);
-                binding.shareButton.setVisibility(View.GONE);
                 shareBitmap(requireActivity(),  takeScreenShotForLayout());
             }
         });
@@ -239,8 +237,6 @@ public class HomeFragment extends Fragment {
                         });
             }
         }
-
-        binding.takeAPhoteButton.setVisibility(View.VISIBLE);
 
     }
 
@@ -385,7 +381,6 @@ public class HomeFragment extends Fragment {
                         Log.d(TAG, "onActivityResult: data is NOT NULL");
                         Bitmap bitmap = (Bitmap) data.getExtras().get("data");
                         binding.homeLayout.setBackground(new BitmapDrawable(getResources(), bitmap));
-                        binding.shareButton.setVisibility(View.VISIBLE);
 //                        navigateToMainScreen(bitmap);
 
                     } else {
@@ -510,8 +505,6 @@ public class HomeFragment extends Fragment {
     {
         try
         {
-//            binding.shareButton.setVisibility(View.GONE);
-//            binding.takeAPhoteButton.setVisibility(View.GONE);
             View rootView = getActivity().getWindow().getDecorView().findViewById(R.id.home_layout);
             rootView.setDrawingCacheEnabled(true);
             return rootView.getDrawingCache();

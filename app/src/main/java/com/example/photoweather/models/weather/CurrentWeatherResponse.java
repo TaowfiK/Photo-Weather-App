@@ -1,7 +1,10 @@
 package com.example.photoweather.models.weather;
 
+import android.util.Log;
+
 import com.google.gson.annotations.SerializedName;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class CurrentWeatherResponse {
@@ -44,101 +47,87 @@ public class CurrentWeatherResponse {
     @SerializedName("wind")
     private Wind wind;
 
-    public int getVisibility()
-    {
+    public int getVisibility() {
         return visibility;
     }
 
-    public int getTimezone()
-    {
+    public int getTimezone() {
         return timezone;
     }
 
-    public Main getMain()
-    {
+    public Main getMain() {
         return main;
     }
 
-    public Clouds getClouds()
-    {
+    public Clouds getClouds() {
         return clouds;
     }
 
-    public Sys getSys()
-    {
+    public Sys getSys() {
         return sys;
     }
 
-    public int getDt()
-    {
-        return dt;
-    }
+    public int getDt() { return dt; }
 
-    public Coord getCoord()
-    {
+    public Coord getCoord() {
         return coord;
     }
 
-    public List<WeatherItem> getWeather()
-    {
+    public List<WeatherItem> getWeather() {
         return weather;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public int getCod()
-    {
+    public int getCod() {
         return cod;
     }
 
-    public int getId()
-    {
+    public int getId() {
         return id;
     }
 
-    public String getBase()
-    {
+    public String getBase() {
         return base;
     }
 
-    public Wind getWind()
-    {
+    public Wind getWind() {
         return wind;
     }
 
-    public String celsius()
-    {
+    public String celsius() {
         double celsius = calculateCelsius(main.getTemp());
 
         return celsius + " \u2103";
     }
 
-    public String maxTemp()
-    {
-        double maxTemp = calculateCelsius(main.getTempMax());
+    public String temp(){
+        double temp = calculateCelsius(main.getTemp());
 
-        return maxTemp + " \u2103";
+        return new DecimalFormat("##.##").format(temp) + " \u2103";
     }
 
-    public String minTemp()
-    {
+    public String maxTemp() {
+        double maxTemp = calculateCelsius(main.getTempMax());
+        Log.d("Tawfik", "maxTemp: " + maxTemp);
+        return new DecimalFormat("##.##").format(maxTemp)  + " \u2103";
+    }
+
+    public String minTemp() {
         double minTemp = calculateCelsius(main.getTempMin());
 
-        return minTemp + " \u2103";
+        return new DecimalFormat("##.##").format(minTemp)  + " \u2103";
     }
 
-    private double calculateCelsius(double temp)
-    {
-        return (temp - 32) / 1.8;
+    private double calculateCelsius(double temp) {
+        return temp - 273.15;
     }
 
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return
                 "CurrentWeatherResponse{" +
                         "visibility = '" + visibility + '\'' +
