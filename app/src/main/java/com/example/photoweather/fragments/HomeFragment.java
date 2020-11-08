@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.os.Looper;
 import android.provider.Settings;
@@ -64,6 +66,8 @@ import java.io.IOException;
 
 import io.reactivex.android.BuildConfig;
 
+import static androidx.core.content.ContextCompat.checkSelfPermission;
+
 public class HomeFragment extends Fragment {
 
     private static final String TAG = "HomeFragment";
@@ -76,6 +80,12 @@ public class HomeFragment extends Fragment {
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
 
     private static final int REQUEST_CHECK_SETTINGS = 100;
+
+    private static final int RC_CAMERA_REQUEST = 201;
+
+    private static final int RC_CAMERA_PERMISSION = 200;
+
+
 
     private FusedLocationProviderClient mFusedLocationClient;
     private SettingsClient mSettingsClient;
@@ -122,10 +132,27 @@ public class HomeFragment extends Fragment {
         binding.takeAPhoteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                {
+                    Log.d(TAG, "onClick: take photo need permission");
+                    requestPermissions(new String[]{Manifest.permission.CAMERA}, RC_CAMERA_PERMISSION);
+                } else
+                {
+                    Log.d(TAG, "onClick: take photo should open camera");
+                    openCamera();
+                }
+            }
+        });
+        binding.shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.takeAPhoteButton.setVisibility(View.GONE);
+                binding.shareButton.setVisibility(View.GONE);
+                shareBitmap(requireActivity(),  takeScreenShotForLayout());
             }
         });
     }
+
     private void networkState()
     {
         mViewModel.getNetworkState().observe(getViewLifecycleOwner(), new Observer<NetworkState>()
@@ -190,6 +217,8 @@ public class HomeFragment extends Fragment {
                         });
             }
         }
+
+        binding.takeAPhoteButton.setVisibility(View.VISIBLE);
 
     }
 
@@ -293,14 +322,30 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == RC_CAMERA_PERMISSION)
+        {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                Toast.makeText(requireContext(), "camera permission granted", Toast.LENGTH_LONG).show();
+                openCamera();
+            } else
+            {
+                Toast.makeText(requireContext(), "camera permission denied", Toast.LENGTH_LONG).show();
+
+            }
+        }
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode)
-        {
+        switch (requestCode) {
             case REQUEST_CHECK_SETTINGS:
-                switch (resultCode)
-                {
+                switch (resultCode) {
                     case Activity.RESULT_OK:
                         Log.e(TAG, "User agreed to make required location settings changes.");
                         break;
@@ -310,7 +355,23 @@ public class HomeFragment extends Fragment {
                         break;
                 }
                 break;
+            case RC_CAMERA_REQUEST:
+                if (resultCode == Activity.RESULT_OK) {
+                    if (data != null && data.getExtras() != null) {
+                        Log.d(TAG, "onActivityResult: data is NOT NULL");
+                        Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+                        binding.homeLayout.setBackground(new BitmapDrawable(getResources(), bitmap));
+                        binding.shareButton.setVisibility(View.VISIBLE);
+//                        navigateToMainScreen(bitmap);
+
+                    } else {
+                        Log.d(TAG, "onActivityResult: data is NULL");
+                    }
+                }
+                break;
         }
+
+
     }
 
     @Override
@@ -336,6 +397,14 @@ public class HomeFragment extends Fragment {
         getImageUriAndShare(requireActivity);
 
     }
+//
+//    private void navigateToMainScreen(Bitmap bitmap)
+//    {
+//        Bundle bundle = new Bundle();
+//        bundle.putParcelable("bitmap", bitmap);
+//        Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+//                .navigate(R.id.action_cameraFragment_to_mainFragment, bundle);
+//    }
 
     private void getImageUriAndShare(Activity requireActivity)
     {
@@ -369,14 +438,13 @@ public class HomeFragment extends Fragment {
     {
         File imagePath = new File(requireActivity.getCacheDir(), "images");
         File newFile = new File(imagePath, "image.png");
-        return FileProvider.getUriForFile(requireContext(), "com.tutorial.openweather.provider", newFile);
+        return FileProvider.getUriForFile(requireContext(), "com.example.photoweather.provider", newFile);
     }
 
     private void createDirectoryAndSaveImage(Activity requireActivity, Bitmap bitmap)
     {
         try
         {
-
             File cachePath = new File(requireActivity.getCacheDir(), "images");
             cachePath.mkdirs(); // don't forget to make the directory
             FileOutputStream stream = new FileOutputStream(cachePath + "/image.png"); // overwrites this image every time
@@ -389,20 +457,22 @@ public class HomeFragment extends Fragment {
         }
     }
 
-//    private Bitmap takeScreenShotForLayout()
-//    {
-//        try
-//        {
-//            View rootView = getActivity().getWindow().getDecorView().findViewById(R.id.root_layout);
-//            rootView.setDrawingCacheEnabled(true);
-//            return rootView.getDrawingCache();
-//        } catch (Exception ex)
-//        {
-//            ex.printStackTrace();
-//        }
-//
-//        return null;
-//    }
+    private Bitmap takeScreenShotForLayout()
+    {
+        try
+        {
+//            binding.shareButton.setVisibility(View.GONE);
+//            binding.takeAPhoteButton.setVisibility(View.GONE);
+            View rootView = getActivity().getWindow().getDecorView().findViewById(R.id.home_layout);
+            rootView.setDrawingCacheEnabled(true);
+            return rootView.getDrawingCache();
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
+        return null;
+    }
 
     @Override
     public void onResume()
@@ -446,5 +516,10 @@ public class HomeFragment extends Fragment {
                         Toast.makeText(requireContext(), "Location updates stopped!", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+    private void openCamera()
+    {
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, RC_CAMERA_REQUEST);
     }
 }
