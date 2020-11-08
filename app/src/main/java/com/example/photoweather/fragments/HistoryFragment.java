@@ -16,27 +16,16 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.photoweather.MainActivity;
 import com.example.photoweather.adapters.PhotoAdapter;
-import com.example.photoweather.databinding.FragmentHistoryItemBindingImpl;
 import com.example.photoweather.databinding.FragmentHistoryListBinding;
-import com.example.photoweather.databinding.FragmentHomeBinding;
 import com.example.photoweather.models.Photo;
-import com.example.photoweather.viewmodels.HomeViewModel;
-import com.example.photoweather.viewmodels.PhotoViewModel;
 
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
-
-import static android.app.Activity.RESULT_OK;
 
 public class HistoryFragment extends Fragment {
 
     private FragmentHistoryListBinding binding;
-    private PhotoViewModel photoViewModel;
 
 
     @Override
@@ -62,21 +51,9 @@ public class HistoryFragment extends Fragment {
 
         binding.photoList.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        PhotoAdapter noteAdapter = new PhotoAdapter();
-        binding.photoList.setAdapter(noteAdapter);
-        Log.d("Tawfik", "onViewCreated: History View Created");
-        photoViewModel = new ViewModelProvider(this).get(PhotoViewModel.class);
-        Log.d("Tawfik", "onViewCreated: View Model Created");
 
 
 
-        photoViewModel.getAllphoto().observe(requireActivity(), new Observer<List<Photo>>() {
-            @Override
-            public void onChanged(List<Photo> notes) {
-                //change Recycle view Data
-                noteAdapter.setPhotos(notes);
-            }
-        });
 
     }
 

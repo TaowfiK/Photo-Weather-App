@@ -1,5 +1,6 @@
 package com.example.photoweather.models;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -9,20 +10,13 @@ public class Photo {
     @PrimaryKey(autoGenerate = true)
     private int id;
 
+    @ColumnInfo(name = "image")
     private String photo;
 
+    @ColumnInfo(name = "date")
     private String date;
 
     private String time;
-
-    public Photo(String photo, String date, String time) {
-        this.photo = photo;
-        this.date = date;
-        this.time = time;
-    }
-
-    public Photo(){
-    }
 
     public int getId(){ return id; }
 
