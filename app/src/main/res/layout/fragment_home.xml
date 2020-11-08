@@ -190,6 +190,15 @@
                 android:layout_marginBottom="70dp"
                 android:text="@string/take_a_phote"
                 android:textSize="30sp" />
+            <Button
+                android:id="@+id/share_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="70dp"
+                android:layout_gravity="center"
+                android:text="@string/share"
+                android:visibility="gone"
+                android:textSize="30sp" />
         </LinearLayout>
 
 

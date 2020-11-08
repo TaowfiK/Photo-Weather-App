@@ -14,12 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.photoweather.fragments.SplashScreenFragment;
-
 public class InitialActivity extends AppCompatActivity {
-
-    // Constants
-    private final static String TAG = SplashScreenFragment.class.getSimpleName();
 
     // Views
     private ImageView splashScreenImageView;
