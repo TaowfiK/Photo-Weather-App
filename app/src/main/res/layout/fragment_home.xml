@@ -23,6 +23,7 @@
     </data>
 
     <FrameLayout
+        android:id="@+id/home_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".fragments.HomeFragment">
@@ -152,7 +153,7 @@
                 android:visibility="@{hideProgress ? View.GONE : View.VISIBLE}" />
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center|bottom"
@@ -163,10 +164,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="70dp"
-                android:onClick="@{() -> listener.takePhotoClicked()}"
                 android:text="@string/take_a_phote"
                 android:textSize="30sp" />
-        </LinearLayout>
+            <Button
+                android:id="@+id/share_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/take_a_phote_button"
+                android:layout_marginBottom="70dp"
+                android:text="@string/share"
+                android:layout_centerInParent="true"
+                android:textSize="30sp" />
+
+        </RelativeLayout>
 
 
     </FrameLayout>
