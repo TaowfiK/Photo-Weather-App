@@ -1,7 +1,17 @@
 package com.example.photoweather.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+
+import androidx.room.TypeConverter;
+
+import java.io.ByteArrayOutputStream;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 
 public class PrefUtils {
 
@@ -64,7 +74,6 @@ public class PrefUtils {
 
     @SuppressLint("DefaultLocale")
     public static String getTemperatureInCelsius(String temperatureInKelvin){
-        Log.d(TAG, "getTemperatureInCelsius: " + temperatureInKelvin);
 
         if ( !temperatureInKelvin.equals("null") && !temperatureInKelvin.equals("0.0")) {
             double temperatureInKelvinDouble;
@@ -72,12 +81,10 @@ public class PrefUtils {
                 String celsiusSymbol = temperatureInKelvin.substring(temperatureInKelvin.length() - 2);
 
                 temperatureInKelvin = temperatureInKelvin.substring(0, temperatureInKelvin.length() - 2);
-                Log.d(TAG, "getTemperatureInCelsius: symbol : " + celsiusSymbol);
                 temperatureInKelvinDouble = Double.parseDouble(temperatureInKelvin);
                 return new DecimalFormat("##.##").format(temperatureInKelvinDouble - 273.15) + celsiusSymbol;
 
             }else{
-                Log.d(TAG, "getTemperatureInCelsius: temprature : " + temperatureInKelvin);
                 temperatureInKelvinDouble = Double.parseDouble(temperatureInKelvin);
 
                 return new DecimalFormat("##.##").format(temperatureInKelvinDouble - 273.15);
