@@ -14,4 +14,8 @@
         android:name="com.example.photoweather.fragments.HistoryFragment"
         android:label="fragment_history_list"
         tools:layout="@layout/fragment_history_list" />
+    <fragment
+        android:id="@+id/photoFragment"
+        android:name="com.example.photoweather.fragments.PhotoFragment"
+        android:label="PhotoFragment" />
 </navigation>

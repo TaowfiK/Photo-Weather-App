@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.net.Uri;
@@ -20,22 +21,25 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.photoweather.AppExecutors;
 import com.example.photoweather.databinding.FragmentHomeBinding;
+import com.example.photoweather.db.PhotoDatabase;
+import com.example.photoweather.models.Photo;
 import com.example.photoweather.models.weather.CurrentWeatherResponse;
 import com.example.photoweather.networking.NetworkState;
+import com.example.photoweather.utils.PrefUtils;
 import com.example.photoweather.viewmodels.HomeViewModel;
 import com.example.photoweather.R;
 import com.google.android.gms.common.api.ApiException;
@@ -60,6 +64,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -74,6 +79,8 @@ public class HomeFragment extends Fragment {
 
     private HomeViewModel mViewModel;
     private FragmentHomeBinding binding;
+    private PhotoDatabase photoDatabase;
+    private Photo photo;
 
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
 
@@ -105,6 +112,8 @@ public class HomeFragment extends Fragment {
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        photoDatabase = PhotoDatabase.getInstance(requireContext());
+        photo= new Photo();
     }
 
     @Override
@@ -164,6 +173,7 @@ public class HomeFragment extends Fragment {
                 } else
                 {
                     binding.setHideProgress(true);
+                    binding.takeAPhoteButton.setEnabled(true);
                 }
             }
         });
@@ -179,8 +189,12 @@ public class HomeFragment extends Fragment {
             @Override
             public void onLocationResult(LocationResult locationResult)
             {
-                mCurrentLocation = locationResult.getLastLocation();
-                updateUI();
+                Log.d(TAG, "onLocationResult: " + locationResult);
+                if (mCurrentLocation == null){
+                    mCurrentLocation = locationResult.getLastLocation();
+                    updateUI();
+                }
+
                 super.onLocationResult(locationResult);
             }
         };
@@ -209,8 +223,19 @@ public class HomeFragment extends Fragment {
                             @Override
                             public void onChanged(CurrentWeatherResponse response)
                             {
-                                Log.d(TAG, "onChanged: response " + response.toString());
-                                binding.setWeather(response);
+                                saveResponseInLocale(response);
+                                takeScreenShotForLayout();
+
+//                                AppExecutors.getInstance().diskIO().execute(new Runnable()
+//                                {
+//                                    @Override
+//                                    public void run()
+//                                    {
+//                                        photoDatabase.photoDao().insert(photo);
+//                                        Log.d(TAG, "run: success");
+//                                    }
+//                                });
+
                             }
                         });
             }
@@ -230,7 +255,6 @@ public class HomeFragment extends Fragment {
                         Log.d(TAG, "onSuccess: Location listener is started");
 
                         mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
-                        updateUI();
                     }
                 }).addOnFailureListener(requireActivity(), new OnFailureListener()
         {
@@ -259,7 +283,6 @@ public class HomeFragment extends Fragment {
                         Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
                 }
 
-                updateUI();
             }
         });
     }
@@ -313,6 +336,8 @@ public class HomeFragment extends Fragment {
         {
             Bitmap bitmap = getArguments().getParcelable("bitmap");
             binding.photoBackground.setImageBitmap(bitmap);
+            String base64 = convertBitmpaToBase64(bitmap);
+            photo.setPhoto(base64);
         }
 
     }
@@ -357,6 +382,15 @@ public class HomeFragment extends Fragment {
                         Log.d(TAG, "onActivityResult: data is NOT NULL");
                         Bitmap bitmap = (Bitmap) data.getExtras().get("data");
                         binding.homeLayout.setBackground(new BitmapDrawable(getResources(), bitmap));
+                        String s = convertBitmpaToBase64(takeScreenShotForLayout());
+                        photo.setPhoto(s);
+                        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                photoDatabase.photoDao().insert(photo);
+                            }
+                        });
+                        binding.shareButton.setEnabled(true);
 //                        navigateToMainScreen(bitmap);
 
                     } else {
@@ -419,6 +453,31 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    private String convertBitmpaToBase64(Bitmap bitmap)
+    {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
+    }
+
+    private Bitmap convertBase64ToBitmap(String encryptedImage)
+    {
+        byte[] decodedBytes = Base64.decode(
+                encryptedImage.substring(encryptedImage.indexOf(",")  + 1),
+                Base64.DEFAULT
+        );
+
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+    }
+
+    private void saveResponseInLocale(CurrentWeatherResponse response)
+    {
+        photo.setDate(PrefUtils.getDate(response.getDt()));
+        binding.setWeather(response);
+    }
+
     private void shareImage(Uri contentUri, Activity requireActivity)
     {
         Intent shareIntent = new Intent();
@@ -475,8 +534,6 @@ public class HomeFragment extends Fragment {
         {
             startLocationListener();
         }
-
-        updateUI();
     }
 
     @Override

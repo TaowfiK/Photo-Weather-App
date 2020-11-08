@@ -14,6 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.photoweather.databinding.FragmentHistoryListBinding;
+
 public class InitialActivity extends AppCompatActivity {
 
     // Views
@@ -56,7 +58,19 @@ public class InitialActivity extends AppCompatActivity {
         vibeTextView.setAnimation(vibeFadeInAnim);
         startButton.setAnimation(buttonFadeInAnim);
 
-        new CountDownTimer(3000, 1000) {
+        setCounterForStartButton();
+
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(InitialActivity.this, MainActivity.class);
+                InitialActivity.this.startActivity(myIntent);
+            }
+        });
+    }
+
+    private void setCounterForStartButton(){
+        new CountDownTimer(2500, 1000) {
 
             public void onTick(long millisUntilFinished) {
             }
@@ -66,14 +80,5 @@ public class InitialActivity extends AppCompatActivity {
             }
 
         }.start();
-
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent myIntent = new Intent(InitialActivity.this, MainActivity.class);
-                myIntent.putExtra("key", "200"); //Optional parameters
-                InitialActivity.this.startActivity(myIntent);
-            }
-        });
     }
 }

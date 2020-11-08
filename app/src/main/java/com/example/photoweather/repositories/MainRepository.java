@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.photoweather.SingleLiveData;
+import com.example.photoweather.db.PhotoDatabase;
 import com.example.photoweather.models.weather.CurrentWeatherResponse;
 import com.example.photoweather.networking.ApiService;
 import com.example.photoweather.networking.NetworkState;
