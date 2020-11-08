@@ -143,7 +143,16 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+        binding.shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.takeAPhoteButton.setVisibility(View.GONE);
+                binding.shareButton.setVisibility(View.GONE);
+                shareBitmap(requireActivity(),  takeScreenShotForLayout());
+            }
+        });
     }
+
     private void networkState()
     {
         mViewModel.getNetworkState().observe(getViewLifecycleOwner(), new Observer<NetworkState>()
@@ -208,6 +217,8 @@ public class HomeFragment extends Fragment {
                         });
             }
         }
+
+        binding.takeAPhoteButton.setVisibility(View.VISIBLE);
 
     }
 
@@ -350,6 +361,7 @@ public class HomeFragment extends Fragment {
                         Log.d(TAG, "onActivityResult: data is NOT NULL");
                         Bitmap bitmap = (Bitmap) data.getExtras().get("data");
                         binding.homeLayout.setBackground(new BitmapDrawable(getResources(), bitmap));
+                        binding.shareButton.setVisibility(View.VISIBLE);
 //                        navigateToMainScreen(bitmap);
 
                     } else {
@@ -426,14 +438,13 @@ public class HomeFragment extends Fragment {
     {
         File imagePath = new File(requireActivity.getCacheDir(), "images");
         File newFile = new File(imagePath, "image.png");
-        return FileProvider.getUriForFile(requireContext(), "com.tutorial.openweather.provider", newFile);
+        return FileProvider.getUriForFile(requireContext(), "com.example.photoweather.provider", newFile);
     }
 
     private void createDirectoryAndSaveImage(Activity requireActivity, Bitmap bitmap)
     {
         try
         {
-
             File cachePath = new File(requireActivity.getCacheDir(), "images");
             cachePath.mkdirs(); // don't forget to make the directory
             FileOutputStream stream = new FileOutputStream(cachePath + "/image.png"); // overwrites this image every time
@@ -450,6 +461,8 @@ public class HomeFragment extends Fragment {
     {
         try
         {
+//            binding.shareButton.setVisibility(View.GONE);
+//            binding.takeAPhoteButton.setVisibility(View.GONE);
             View rootView = getActivity().getWindow().getDecorView().findViewById(R.id.home_layout);
             rootView.setDrawingCacheEnabled(true);
             return rootView.getDrawingCache();
